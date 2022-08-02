@@ -1,6 +1,7 @@
 package com.tomuvak.testing.gc
 
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 
 /**
  * Triggers garbage collection synchronously. Not guaranteed to actually work in JVM and Native, but seems to.
@@ -22,4 +23,30 @@ expect fun whenCollectingGarbage()
  * depending on platform and circumstances, may be memory- and computation-intensive), and is recommended to only be
  * used when targeting (also) a platform where [whenCollectingGarbage] isn't an option (= JS).
  */
-expect suspend fun CoroutineScope.tryToAchieveByForcingGc(condition: () -> Boolean): Boolean
+suspend fun tryToAchieveByForcingGc(condition: () -> Boolean): Boolean {
+    if (condition()) return true
+
+    var garbageHasBeenCollected = false
+    try {
+        whenCollectingGarbage()
+        garbageHasBeenCollected = true
+    } catch (_: NotImplementedError) {}
+
+    if (garbageHasBeenCollected) return condition()
+
+    var result: Boolean
+    coroutineScope {
+        var data = List(4 * 1024 * 1024) { it }
+        delay(1)
+        for (i in 0 until 7) {
+            if (condition()) {
+                result = true
+                return@coroutineScope
+            }
+            delay(1)
+            data = data.map { it }
+        }
+        result = condition()
+    }
+    return result
+}
