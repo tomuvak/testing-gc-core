@@ -161,7 +161,7 @@ without a unified interface for weak references (not provided by this library), 
 private fun generateObjectUnderTestAndWeakReferenceToInput():
         Pair<ObjectUnderTest, WeakReference<InputForObjectUnderTest>> {
     val input = InputForObjectUnderTest()
-    return Pair(ObjectUnderTest(input), new WeakReference(input))
+    return Pair(ObjectUnderTest(input), WeakReference(input))
 }
 ```
 
@@ -190,7 +190,7 @@ references (not provided by this library) and can then work as is for all platfo
 private fun generateObjectUnderTestAndWeakReferenceToInput():
         Pair<ObjectUnderTest, WeakReference<InputForObjectUnderTest>> {
     val input = InputForObjectUnderTest()
-    return Pair(ObjectUnderTest(input), new WeakReference(input))
+    return Pair(ObjectUnderTest(input), WeakReference(input))
 }
 ```
 
