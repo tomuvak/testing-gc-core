@@ -222,7 +222,7 @@ kotlin {
             }
             testTask {
                 useMocha {
-                    timeout = "30s"
+                    timeout = "12s"
                 }
             }
         }
