@@ -199,10 +199,11 @@ The implementation of `tryToAchieveByForcingGc` on Kotlin JS tries to trigger ga
 computations. As such, tests using it might require a long time to run, and with default configuration are likely to
 fail because they exceed the default timeout.
 
-To change the timeout assign the desired value (e.g. `"30s"` – that is thirty seconds, should normally be enough, but
-YMMV) to `timeout` within the `useMocha` block within the `testTask` block within the `browser`/`nodejs` block within
-the `js` block within the `kotlin` block in the `build.gradle.kts` file (creating the relevant blocks if they don't
-already exist), e.g.:
+To change the timeout assign the desired value (e.g. `"12s"` – that is twelve seconds – suffices for known usages, but
+the exact time needed for a specific test might vary greatly depending on the specifics of the test and of the
+environment on which it is run) to `timeout` within the `useMocha` block within the `testTask` block within the
+`browser`/`nodejs` block within the `js` block within the `kotlin` block in the `build.gradle.kts` file (creating the
+relevant blocks if they don't already exist), e.g.:
 
 ```kotlin
 .

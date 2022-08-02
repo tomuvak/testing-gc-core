@@ -11,9 +11,9 @@ actual suspend fun CoroutineScope.tryToAchieveByForcingGc(condition: () -> Boole
 
     var result: Boolean
     coroutineScope {
-        var data = List(64 * 1024 * 1024) { it }
+        var data = List(4 * 1024 * 1024) { it }
         delay(1)
-        for (i in 0 until 4) {
+        for (i in 0 until 7) {
             if (condition()) {
                 result = true
                 return@coroutineScope
