@@ -62,7 +62,7 @@ inside the `sourceSet { ... }` block, e.g.
 ```kotlin
         val commonTest by getting {
             dependencies {
-                implementation("com.tomuvak.testing-gc:testing-gc:0.0.1")
+                implementation("com.tomuvak.testing-gc:testing-gc:0.0.2")
             }
         }
 ```
