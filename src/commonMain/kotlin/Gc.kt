@@ -1,4 +1,4 @@
-package com.tomuvak.testing.gc
+package com.tomuvak.testing.gc.core
 
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay

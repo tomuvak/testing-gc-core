@@ -1,10 +1,10 @@
-# `com.tomuvak.testing-gc` – a multi-platform Kotlin library with utilities for tests relying on garbage collection
+# `com.tomuvak.testing-gc-core` – a multi-platform Kotlin library with primitive utilities for tests relying on garbage collection
 This library is licensed under the [MIT License](https://en.wikipedia.org/wiki/MIT_License);
 see [LICENSE.txt](LICENSE.txt).
 
 ## Table of contents
 * [Rationale](#rationale)
-* [How to use `com.tomuvak.testing-gc`](#how-to-use-comtomuvaktesting-gc)
+* [How to use `com.tomuvak.testing-gc-core`](#how-to-use-comtomuvaktesting-gc-core)
   * [Including this library in a Kotlin project](#including-this-library-in-a-kotlin-project)
   * [Using the functionality in code](#using-the-functionality-in-code)
     * [General approach](#general-approach)
@@ -37,7 +37,7 @@ This library tries to offer some remedy, by providing utilities which (at least 
 the releasing of memory and (at least to some extent) are exposed with a unified interface that allows users of the
 library to write a single version of their tests which can then run cross-platform.
 
-## How to use `com.tomuvak.testing-gc`
+## How to use `com.tomuvak.testing-gc-core`
 
 ### Including this library in a Kotlin project
 To add the library from
@@ -48,7 +48,7 @@ inside the `repositories { ... }` block in the project's `build.gradle.kts` file
 
 ```kotlin
     maven {
-        url = uri("https://maven.pkg.github.com/tomuvak/testing-gc")
+        url = uri("https://maven.pkg.github.com/tomuvak/testing-gc-core")
         credentials { // See note below
             username = "<GitHub user name>"
             password = "<GitHub personal access token>"
@@ -62,7 +62,7 @@ inside the `sourceSet { ... }` block, e.g.
 ```kotlin
         val commonTest by getting {
             dependencies {
-                implementation("com.tomuvak.testing-gc:testing-gc:0.0.2")
+                implementation("com.tomuvak.testing-gc-core:testing-gc-core:<version>")
             }
         }
 ```
@@ -124,7 +124,7 @@ unified interface).
   help.
 
 #### Using `whenCollectingGarbage`
-Code using `com.tomuvak.testing.gc.whenCollectingGarbage` will compile on all platforms, but will throw at run time
+Code using `com.tomuvak.testing.gc.core.whenCollectingGarbage` will compile on all platforms, but will throw at run time
 where the functionality is not supported (= on JS).
 
 The following example uses `whenCollectingGarbage()` with a finalizer; it assumes JVM (no other platform supports both).
@@ -166,7 +166,7 @@ private fun generateObjectUnderTestAndWeakReferenceToInput():
 ```
 
 #### Using `tryToAchieveByForcingGc`
-Code using `com.tomuvak.testing.gc.tryToAchieveByForcingGc` will compile and work on all platforms. It is more
+Code using `com.tomuvak.testing.gc.core.tryToAchieveByForcingGc` will compile and work on all platforms. It is more
 complicated to use than [`whenCollectingGarbage`](#using-whencollectinggarbage), so it's not recommended unless a test
 targeting (also) platforms where the latter function can't be used (i.e. JS) is required.
 

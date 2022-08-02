@@ -1,3 +1,3 @@
 
-rootProject.name = "testing-gc"
+rootProject.name = "testing-gc-core"
 

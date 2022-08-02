@@ -1,4 +1,4 @@
-package com.tomuvak.testing.gc
+package com.tomuvak.testing.gc.core
 
 import kotlin.native.internal.GC
 

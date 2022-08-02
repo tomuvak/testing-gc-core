@@ -5,7 +5,7 @@ plugins {
     `maven-publish`
 }
 
-group = "com.tomuvak.testing-gc"
+group = "com.tomuvak.testing-gc-core"
 version = "0.0.3-SNAPSHOT"
 
 val localProperties = Properties()
