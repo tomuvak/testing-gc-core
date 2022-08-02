@@ -124,8 +124,8 @@ unified interface).
   help.
 
 #### Using `whenCollectingGarbage`
-Code using `com.tomuvak.testing.gc.whenCollectingGarbage` will compile on all platforms, but will throw at runtime where
-the functionality is not supported (= on JS).
+Code using `com.tomuvak.testing.gc.whenCollectingGarbage` will compile on all platforms, but will throw at run time
+where the functionality is not supported (= on JS).
 
 The following example uses `whenCollectingGarbage()` with a finalizer; it assumes JVM (no other platform supports both).
 
