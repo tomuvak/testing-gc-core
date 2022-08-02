@@ -7,17 +7,19 @@ import kotlinx.coroutines.delay
 actual fun whenCollectingGarbage() { error("Triggering garbage collection not supported on platform") }
 
 actual suspend fun CoroutineScope.tryToAchieveByForcingGc(condition: () -> Boolean): Boolean {
-    var result: Boolean
+    if (condition()) return true
 
+    var result: Boolean
     coroutineScope {
         var data = List(64 * 1024 * 1024) { it }
+        delay(1)
         for (i in 0 until 4) {
             if (condition()) {
                 result = true
-                break
+                return@coroutineScope
             }
             delay(1)
-            data = data.map { it * 2 }
+            data = data.map { it }
         }
         result = condition()
     }
