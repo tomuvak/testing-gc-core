@@ -195,9 +195,10 @@ private fun generateObjectUnderTestAndWeakReferenceToInput():
 ```
 
 ##### Timeout
-The implementation of `tryToAchieveByForcingGc` on Kotlin JS tries to trigger garbage collection by performing heavy
-computations. As such, tests using it might require a long time to run, and with default configuration are likely to
-fail because they exceed the default timeout.
+On platforms not supporting direct triggering of garbage collection (= JS), the implementation of
+`tryToAchieveByForcingGc` performs heavy computations, in the hope that that will cause garbage collection to run. As a
+result, tests using it might require a long time to run, and with default configuration might exceed the allotted
+timeout and fail.
 
 To change the timeout assign the desired value (e.g. `"12s"` – that is twelve seconds – suffices for known usages, but
 the exact time needed for a specific test might vary greatly depending on the specifics of the test and of the
