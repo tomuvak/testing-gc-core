@@ -2,6 +2,10 @@
 This library is licensed under the [MIT License](https://en.wikipedia.org/wiki/MIT_License);
 see [LICENSE.txt](LICENSE.txt).
 
+See also [`com.tomuvak.testing-gc`][1]: this library offers _primitive_ utilities for triggering garbage collection,
+while that one (which uses these primitive utilities under the hood) offers higher-level constructs to help in actual
+testing scenarios involving garbage collection, using [weak references][2].
+
 ## Table of contents
 * [Rationale](#rationale)
 * [How to use `com.tomuvak.testing-gc-core`](#how-to-use-comtomuvaktesting-gc-core)
@@ -35,7 +39,9 @@ involved, whatever tooling does exist naturally tends to be platform-specific.
 
 This library tries to offer some remedy, by providing utilities which (at least to some extent) do enable testing for
 the releasing of memory and (at least to some extent) are exposed with a unified interface that allows users of the
-library to write a single version of their tests which can then run cross-platform.
+library to write a single version of their tests which can then run cross-platform. See also
+[`com.tomuvak.testing-gc`][1], which uses this library to offer higher-level constructs for verifying that memory has
+can be reclaimed, with the help of [weak references][2].
 
 ## How to use `com.tomuvak.testing-gc-core`
 
@@ -100,17 +106,17 @@ will be observable if and only if the respective objects have been reclaimed. Su
 [JS](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/FinalizationRegistry), but not on
 Native – see e.g. [Kotlin Discussions](https://discuss.kotlinlang.org/t/finalize-alternative-in-kotlin-native/5030),
 [Stack Overflow](https://stackoverflow.com/questions/44747862/does-kotlin-native-have-destructors),
-[YouTrack][1], [GitHub issue](https://github.com/JetBrains/kotlin-native/issues/2327)), or it can be the nullification
-of a [weak reference](https://en.wikipedia.org/wiki/Weak_reference) (supported
-[on](https://docs.oracle.com/javase/8/docs/api/java/lang/ref/WeakReference.html)
+[YouTrack][4], [GitHub issue](https://github.com/JetBrains/kotlin-native/issues/2327)), or it can be the nullification
+of a [weak reference][2] (supported [on](https://docs.oracle.com/javase/8/docs/api/java/lang/ref/WeakReference.html)
 [all](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.native.ref/-weak-reference/)
 [platforms](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakRef), though without a
-unified interface).
+unified interface; another library might be used for cross-platform weak reference support, e.g.
+[`com.tomuvak.weak-reference`][3]).
 
 #### Caveats
 * This library provides functionality which helps trigger garbage collection. It does **not** provide any functionality
-  to help set up finalizers and/or weak references, at least not currently. Users of the library should take care of
-  that on their own or use a separate library for that.
+  to help set up finalizers and/or weak references. Users of the library should take care of that on their own or use a
+  separate library for that (e.g. [`com.tomuvak.weak-reference`][3]), or consider using [`com.tomuvak.testing-gc`][1].
 * The functionality provided – while proven to have worked for some projects under some circumstances – cannot and does
   not guarantee that attempting to trigger garbage collection will indeed always trigger garbage collection.
 * Even when garbage does indeed get collected, this does not guarantee execution of finalizers. (Empiric evidence
@@ -121,7 +127,7 @@ unified interface).
 * As in the [two](https://stackoverflow.com/a/71537602) [examples](https://stackoverflow.com/a/73070221) mentioned
   above, it's possible there'll be hidden references preventing objects from being reclaimed. Diagnosing such cases
   might not be trivial. Extracting the generation of the objects which are to be reclaimed to other functions might
-  help.
+  help ([`com.tomuvak.testing-gc`][1] offers some functionality for that as well).
 
 #### Using `whenCollectingGarbage`
 Code using `com.tomuvak.testing.gc.core.whenCollectingGarbage` will compile on all platforms, but will throw at run time
@@ -146,8 +152,8 @@ private fun generateInputForObjectUnderTestWithFinalizer(onFinalization: () -> U
     }
 ```
 
-The following example uses `whenCollectingGarbage()` with a weak reference; it assumes either JVM or Native, but,
-without a unified interface for weak references (not provided by this library), cannot be used as is for both.
+The following example uses `whenCollectingGarbage()` with a weak reference; it assumes either JVM or Native, and uses
+the cross-platform `WeakReference` implementation offered by [`com.tomuvak.weak-reference`][3].
 
 ```kotlin
 @Test fun `template for using whenCollectingGarbage with weak reference`() {
@@ -155,7 +161,7 @@ without a unified interface for weak references (not provided by this library), 
     objectUnderTest.doStuffAfterWhichInputIsNoLongerNeeded()
 
     whenCollectingGarbage()
-    assertNull(reference.get())
+    assertNull(reference.targetOrNull)
 }
 
 private fun generateObjectUnderTestAndWeakReferenceToInput():
@@ -171,20 +177,20 @@ complicated to use than [`whenCollectingGarbage`](#using-whencollectinggarbage),
 targeting (also) platforms where the latter function can't be used (i.e. JS) is required.
 
 It can only be run from a coroutine, so an "async" test is required. On JVM and Native this is easy to achieve with
-[`kotlinx.coroutines.runBlocking`][2], but then again if targeting only JVM and/or Native this function is not likely to
+[`kotlinx.coroutines.runBlocking`][5], but then again if targeting only JVM and/or Native this function is not likely to
 be used in the first place. There are other ways to run async tests on Kotlin JS; the sister library
 [`com.tomuvak.testing-coroutines`](https://github.com/tomuvak/testing-coroutines) offers a unified interface for async
 tests which works with the same code on all platforms (the following example uses
-[`com.tomuvak.testing.coroutines.asyncTest`][3]).
+[`com.tomuvak.testing.coroutines.asyncTest`][6]).
 
-The following example uses `tryToAchieveByForcingGc()` with a weak reference; it assumes a unified interface for weak
-references (not provided by this library) and can then work as is for all platforms.
+The following example uses `tryToAchieveByForcingGc()` with a weak reference; it is cross-platform, and uses the
+`WeakReference` implementation provided by [`com.tomuvak.weak-reference`][3].
 
 ```kotlin
 @Test fun `template for using tryToAchieveByForcingGc with weak reference`() = asyncTest { // Note use of asyncTest
     val (objectUnderTest, reference) = generateObjectUnderTestAndWeakReferenceToInput()
     objectUnderTest.doStuffAfterWhichInputIsNoLongerNeeded()
-    assertTrue(tryToAchieveByForcingGc { reference.get() == null })
+    assertTrue(tryToAchieveByForcingGc { reference.targetOrNull == null })
 }
 
 private fun generateObjectUnderTestAndWeakReferenceToInput():
@@ -193,6 +199,9 @@ private fun generateObjectUnderTestAndWeakReferenceToInput():
     return Pair(ObjectUnderTest(input), WeakReference(input))
 }
 ```
+
+(Note: the sister library [`com.tomuvak.testing-gc`][1] offers utilities to write tests like the last example above more
+concisely.)
 
 ##### Timeout
 On platforms not supporting direct triggering of garbage collection (= JS), the implementation of
@@ -239,6 +248,9 @@ kotlin {
 .
 ```
 
-[1]: https://youtrack.jetbrains.com/issue/KT-44191/Cleanup-hook-for-KotlinNative-that-gets-called-when-or-after-an-object-is-garbage-collected
-[2]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/run-blocking.html
-[3]: https://github.com/tomuvak/testing-coroutines#using-the-functionality-in-code
+[1]: https://github.com/tomuvak/testing-gc
+[2]: https://en.wikipedia.org/wiki/Weak_reference
+[3]: https://github.com/tomuvak/weak-reference
+[4]: https://youtrack.jetbrains.com/issue/KT-44191/Cleanup-hook-for-KotlinNative-that-gets-called-when-or-after-an-object-is-garbage-collected
+[5]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/run-blocking.html
+[6]: https://github.com/tomuvak/testing-coroutines#using-the-functionality-in-code
