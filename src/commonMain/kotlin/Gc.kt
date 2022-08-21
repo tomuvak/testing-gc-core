@@ -15,11 +15,12 @@ import kotlinx.coroutines.delay
 expect fun whenCollectingGarbage(): Boolean
 
 /**
- * Evaluates the given [condition] at least once and potentially multiple times (the exact number of times is
- * indeterminate and implementation/platform-specific, but bound) and returns `true` as soon as the [condition]
- * evaluates to `true`, or `false` if all evaluations resulted in `false`. Might try to trigger garbage collection along
- * the process, either directly (e.g. by invoking [whenCollectingGarbage] on platforms where it's supported) or
- * indirectly (e.g. by performing a memory-intensive task in the hope that garbage collection will be triggered).
+ * Evaluates the given [condition] at least once and potentially multiple times (twice on platforms supporting direct
+ * triggering of garbage collections, and up to nine times on platforms which don't – namely JS) and returns `true` as
+ * soon as the [condition] evaluates to `true`, or `false` if all evaluations resulted in `false`. Tries to trigger
+ * garbage collection between consecutive evaluations of [condition], either directly (by invoking
+ * [whenCollectingGarbage] internally on platforms where it's supported) or indirectly (by performing a memory-intensive
+ * task in the hope that garbage collection will be triggered, on JS).
  *
  * Can only be called from a coroutine.
  *

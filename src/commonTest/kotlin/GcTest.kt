@@ -19,4 +19,15 @@ class GcTest {
     @Test fun tryToAchieveByForcingGcReturnsFalseWhenConditionIsAlwaysFalse() = asyncTest {
         assertFalse(tryToAchieveByForcingGc { false })
     }
+
+    @Test fun tryToAchieveByForcingGcOnlyAttemptsTheSpecifiedNumberOfTimes() = asyncTest {
+        var numEvaluations = 0
+        assertFalse(tryToAchieveByForcingGc {
+            numEvaluations++
+            false
+        })
+        assertEquals(maxNumAttemptsForPlatform, numEvaluations)
+    }
+
+    private val maxNumAttemptsForPlatform: Int get() = if (whenCollectingGarbage()) 2 else 9
 }
