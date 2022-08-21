@@ -2,4 +2,7 @@
 
 package com.tomuvak.testing.gc.core
 
-actual fun whenCollectingGarbage() = System.gc()
+actual fun whenCollectingGarbage(): Boolean {
+    System.gc()
+    return true
+}

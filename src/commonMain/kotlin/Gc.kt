@@ -4,11 +4,15 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 
 /**
- * Triggers garbage collection synchronously. Not guaranteed to actually work in JVM and Native, but seems to.
- * Not supported on JS (at least currently, and perhaps indefinitely), and will throw at run time if attempted.
+ * On supported platforms (currently JVM and Native), triggers garbage collection synchronously and returns `true`. Not
+ * guaranteed to actually work, but empirically seems to (note that a return value of `true` doesn't assure garbage has
+ * actually been collected – it only signals that the functionality is supposed to be supported on the platform).
+ *
+ * On unsupported platforms (currently, and perhaps indefinitely, JS), does nothing and returns `false`.
+ *
  * [tryToAchieveByForcingGc] should be considered as an alternative if a solution which covers JS as well is desired.
  */
-expect fun whenCollectingGarbage()
+expect fun whenCollectingGarbage(): Boolean
 
 /**
  * Evaluates the given [condition] at least once and potentially multiple times (the exact number of times is
@@ -25,14 +29,7 @@ expect fun whenCollectingGarbage()
  */
 suspend fun tryToAchieveByForcingGc(condition: () -> Boolean): Boolean {
     if (condition()) return true
-
-    var garbageHasBeenCollected = false
-    try {
-        whenCollectingGarbage()
-        garbageHasBeenCollected = true
-    } catch (_: NotImplementedError) {}
-
-    if (garbageHasBeenCollected) return condition()
+    if (whenCollectingGarbage()) return condition()
 
     var result: Boolean
     coroutineScope {
