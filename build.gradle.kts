@@ -14,6 +14,13 @@ fun local(key: String): String? = localProperties.getProperty(key)
 
 repositories {
     mavenCentral()
+    maven {
+        url = uri("https://maven.pkg.github.com/tomuvak/testing-coroutines")
+        credentials {
+            username = local("githubUser")
+            password = local("githubToken")
+        }
+    }
 }
 
 kotlin {
@@ -43,7 +50,12 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
             }
         }
-        val commonTest by getting
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+                implementation("com.tomuvak.testing-coroutines:testing-coroutines:0.0.2")
+            }
+        }
 
         val jvmMain by getting
         val jvmTest by getting

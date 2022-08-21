@@ -1,5 +1,7 @@
 name: Build & tests
 on: push
+permissions:
+  packages: read
 jobs:
   check-on-push:
     strategy:
@@ -9,6 +11,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
+      - shell: bash
+        env:
+          USERNAME: ${{ github.actor }}
+          TOKEN: ${{ github.token }}
+        run: echo "githubUser=$USERNAME"$'\n'"githubToken=$TOKEN" > local.properties
       - uses: gradle/gradle-build-action@v2
         with:
           arguments: check
