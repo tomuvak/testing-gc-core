@@ -15,12 +15,13 @@ import kotlinx.coroutines.delay
 expect fun whenCollectingGarbage(): Boolean
 
 /**
- * Evaluates the given [condition] at least once and potentially multiple times (twice on platforms supporting direct
- * triggering of garbage collections, and up to nine times on platforms which don't – namely JS) and returns `true` as
- * soon as the [condition] evaluates to `true`, or `false` if all evaluations resulted in `false`. Tries to trigger
- * garbage collection between consecutive evaluations of [condition], either directly (by invoking
- * [whenCollectingGarbage] internally on platforms where it's supported) or indirectly (by performing a memory-intensive
- * task in the hope that garbage collection will be triggered, on JS).
+ * Evaluates the given [condition] at least once and potentially multiple times (up to the given [maxNumAttempts], which
+ * must be at least `2`, on platforms that do not support direct triggering of garbage collection – namely JS, or twice
+ * on platforms that do, regardless of [maxNumAttempts]) and returns `true` as soon as the [condition] evaluates to
+ * `true`, or `false` if all evaluations resulted in `false`. Tries to trigger garbage collection between consecutive
+ * evaluations of [condition], either directly (by invoking [whenCollectingGarbage] internally on platforms where it's
+ * supported) or indirectly (by performing a memory-intensive task in the hope that garbage collection will be
+ * triggered, on JS).
  *
  * Can only be called from a coroutine.
  *
@@ -28,7 +29,8 @@ expect fun whenCollectingGarbage(): Boolean
  * depending on platform and circumstances, may be memory- and computation-intensive), and is recommended to only be
  * used when targeting (also) a platform where [whenCollectingGarbage] isn't an option (= JS).
  */
-suspend fun tryToAchieveByForcingGc(condition: () -> Boolean): Boolean {
+suspend fun tryToAchieveByForcingGc(maxNumAttempts: Int = 9, condition: () -> Boolean): Boolean {
+    require(maxNumAttempts >= 2) { "maxNumAttempts must be at least 2 (was $maxNumAttempts)" }
     if (condition()) return true
     if (whenCollectingGarbage()) return condition()
 
@@ -36,7 +38,7 @@ suspend fun tryToAchieveByForcingGc(condition: () -> Boolean): Boolean {
     coroutineScope {
         var data = List(4 * 1024 * 1024) { it }
         delay(1)
-        for (i in 0 until 7) {
+        for (i in 1 until maxNumAttempts - 1) {
             if (condition()) {
                 result = true
                 return@coroutineScope

@@ -1,5 +1,7 @@
 package com.tomuvak.testing.gc.core
 
+import com.tomuvak.testing.assertions.assertFailsWithTypeAndMessageContaining
+import com.tomuvak.testing.assertions.mootProvider
 import com.tomuvak.testing.coroutines.asyncTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -7,27 +9,33 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class GcTest {
-    @Test fun tryToAchieveByForcingGcOnlyEvaluatesTrueConditionOnceAndReturnsTrue() = asyncTest {
-        var numEvaluations = 0
-        assertTrue(tryToAchieveByForcingGc {
-            numEvaluations++
-            true
-        })
-        assertEquals(1, numEvaluations)
+    @Test fun tryToAchieveByForcingGcRequiresMaxNumAttemptsToBeAtLeastTwo() = asyncTest {
+        for (maxNumAttempts in -2 until 2)
+            assertFailsWithTypeAndMessageContaining<IllegalArgumentException>(2, maxNumAttempts) {
+                tryToAchieveByForcingGc(maxNumAttempts, mootProvider)
+            }
     }
 
-    @Test fun tryToAchieveByForcingGcReturnsFalseWhenConditionIsAlwaysFalse() = asyncTest {
-        assertFalse(tryToAchieveByForcingGc { false })
+    @Test fun tryToAchieveByForcingGcReturnsTrueAsSoonAsConditionEvaluatesToTrue() = asyncTest {
+        for (numAttempts in 1..5) if (canAttemptThatManyTimesOnPlatform(numAttempts))
+            for (maxNumAttempts in numAttempts.coerceAtLeast(2)..7) {
+                var numEvaluations = 0
+                assertTrue(tryToAchieveByForcingGc(maxNumAttempts) { ++numEvaluations == numAttempts })
+                assertEquals(numEvaluations, numAttempts)
+            }
     }
 
     @Test fun tryToAchieveByForcingGcOnlyAttemptsTheSpecifiedNumberOfTimes() = asyncTest {
-        var numEvaluations = 0
-        assertFalse(tryToAchieveByForcingGc {
-            numEvaluations++
-            false
-        })
-        assertEquals(maxNumAttemptsForPlatform, numEvaluations)
+        for (maxNumAttempts in 2..7) {
+            var numEvaluations = 0
+            assertFalse(tryToAchieveByForcingGc(maxNumAttempts) {
+                numEvaluations++
+                false
+            })
+            assertEquals(if (canAttemptThatManyTimesOnPlatform(maxNumAttempts)) maxNumAttempts else 2, numEvaluations)
+        }
     }
 
-    private val maxNumAttemptsForPlatform: Int get() = if (whenCollectingGarbage()) 2 else 9
+    private fun canAttemptThatManyTimesOnPlatform(numAttempts: Int): Boolean =
+        numAttempts <= 2 || !whenCollectingGarbage()
 }
