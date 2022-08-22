@@ -12,7 +12,7 @@ class GcTest {
     @Test fun tryToAchieveByForcingGcRequiresMaxNumAttemptsToBeAtLeastTwo() = asyncTest {
         for (maxNumAttempts in -2 until 2)
             assertFailsWithTypeAndMessageContaining<IllegalArgumentException>(2, maxNumAttempts) {
-                tryToAchieveByForcingGc(maxNumAttempts, mootProvider)
+                tryToAchieveByForcingGc(maxNumAttempts, condition=mootProvider)
             }
     }
 
@@ -34,6 +34,13 @@ class GcTest {
             })
             assertEquals(if (canAttemptThatManyTimesOnPlatform(maxNumAttempts)) maxNumAttempts else 2, numEvaluations)
         }
+    }
+
+    @Test fun tryToAchieveByForcingGcRequiresDataSizeInIntsToBeNonNegative() = asyncTest {
+        for (dataSizeInInts in listOf(-1048576, -1024, -2, -1))
+            assertFailsWithTypeAndMessageContaining<IllegalArgumentException>("negative", dataSizeInInts) {
+                tryToAchieveByForcingGc(dataSizeInInts=dataSizeInInts, condition=mootProvider)
+            }
     }
 
     private fun canAttemptThatManyTimesOnPlatform(numAttempts: Int): Boolean =
