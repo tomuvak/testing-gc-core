@@ -44,8 +44,8 @@ involved, whatever tooling does exist naturally tends to be platform-specific.
 This library tries to offer some remedy, by providing utilities which (at least to some extent) do enable testing for
 the releasing of memory and (at least to some extent) are exposed with a unified interface that allows users of the
 library to write a single version of their tests which can then run cross-platform. See also
-[`com.tomuvak.testing-gc`][7], which uses this library to offer higher-level constructs for verifying that memory has
-can be reclaimed, with the help of [weak references][8].
+[`com.tomuvak.testing-gc`][7], which uses this library under the hood to offer higher-level constructs for verifying
+that memory can be reclaimed, with the help of [weak references][8].
 
 ## How to use `com.tomuvak.testing-gc-core`
 
