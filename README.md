@@ -72,12 +72,12 @@ inside the `sourceSet { ... }` block, e.g.
 ```kotlin
         val commonTest by getting {
             dependencies {
-                implementation("com.tomuvak.testing-gc-core:testing-gc-core:0.0.3")
+                implementation("com.tomuvak.testing-gc-core:testing-gc-core:<version>")
             }
         }
 ```
 
-to add it for the test source sets on all platforms in a multi-platform project.
+([![Latest release version][3_]][4]) to add it for the test source sets on all platforms in a multi-platform project.
 
 Note about credentials: it seems that even though this repository is public and everyone can download this library from
 GitHub Packages, one still needs to supply credentials for some reason. Any GitHub user should work, when provided with
@@ -255,6 +255,7 @@ kotlin {
 [1]: https://img.shields.io/github/license/tomuvak/testing-gc-core?label=Licence
 [2]: LICENSE.txt
 [3]: https://img.shields.io/github/v/tag/tomuvak/testing-gc-core?label=Latest%20release
+[3_]: https://img.shields.io/github/v/tag/tomuvak/testing-gc-core?label=Latest%20release%20version%20%28ignoring%20the%20initial%20%27v%27%29%3A&style=plastic
 [4]: https://github.com/tomuvak/testing-gc-core/tags
 [5]: https://github.com/tomuvak/testing-gc-core/actions/workflows/check-on-push.yaml/badge.svg
 [6]: https://github.com/tomuvak/testing-gc-core/actions/workflows/check-on-push.yaml
