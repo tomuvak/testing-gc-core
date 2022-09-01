@@ -134,8 +134,8 @@ unified interface; another library might be used for cross-platform weak referen
   help ([`com.tomuvak.testing-gc`][7] offers some functionality for that as well).
 
 #### Using `whenCollectingGarbage`
-Code using `com.tomuvak.testing.gc.core.whenCollectingGarbage` will compile on all platforms, but will throw at run time
-where the functionality is not supported (= on JS).
+`com.tomuvak.testing.gc.core.whenCollectingGarbage` compiles and runs on all platforms, but does nothing where the
+functionality is not supported (= on JS).
 
 The following example uses `whenCollectingGarbage()` with a finalizer; it assumes JVM (no other platform supports both).
 
