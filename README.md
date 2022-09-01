@@ -185,7 +185,10 @@ It can only be run from a coroutine, so an "async" test is required. On JVM and 
 to be used in the first place. There are other ways to run async tests on Kotlin JS; the sister library
 [`com.tomuvak.testing-coroutines`](https://github.com/tomuvak/testing-coroutines) offers a unified interface for async
 tests which works with the same code on all platforms (the following example uses
-[`com.tomuvak.testing.coroutines.asyncTest`][12]).
+[`com.tomuvak.testing.coroutines.asyncTest`][12]). (Note:
+[`kotlinx-coroutines-test`](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-test/)'s [`runTest`][13]
+won't work for this purpose on JS, as it [skips `delay`s][14] – which on JS are necessary for the inner workings of
+`tryToAchieveByForcingGc`.)
 
 The following example uses `tryToAchieveByForcingGc()` with a weak reference; it is cross-platform, and uses the
 `WeakReference` implementation provided by [`com.tomuvak.weak-reference`][9].
@@ -265,3 +268,5 @@ kotlin {
 [10]: https://youtrack.jetbrains.com/issue/KT-44191/Cleanup-hook-for-KotlinNative-that-gets-called-when-or-after-an-object-is-garbage-collected
 [11]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/run-blocking.html
 [12]: https://github.com/tomuvak/testing-coroutines#using-the-functionality-in-code
+[13]: https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-test/kotlinx.coroutines.test/run-test.html
+[14]: https://github.com/Kotlin/kotlinx.coroutines/tree/master/kotlinx-coroutines-test#runtest
