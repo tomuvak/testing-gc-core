@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.tomuvak.testing-gc-core"
-version = "0.0.6"
+version = "0.0.7-SNAPSHOT"
 
 val localProperties = Properties()
 project.rootProject.file("local.properties").takeIf { it.canRead() }?.inputStream()?.let(localProperties::load)
