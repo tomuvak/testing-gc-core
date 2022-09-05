@@ -1,7 +1,7 @@
 package com.tomuvak.testing.gc.core
 
-import com.tomuvak.testing.assertions.assertFailsWithTypeAndMessageContaining
-import com.tomuvak.testing.assertions.mootProvider
+import com.tomuvak.testing.assertFailsWithTypeAndMessageContaining
+import com.tomuvak.testing.mootProvider
 import com.tomuvak.testing.coroutines.asyncTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
